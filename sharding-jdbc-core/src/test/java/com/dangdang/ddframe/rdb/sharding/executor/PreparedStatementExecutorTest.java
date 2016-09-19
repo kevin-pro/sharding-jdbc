@@ -72,6 +72,16 @@ public final class PreparedStatementExecutorTest {
         ExecutorTestUtil.clear();
         DMLExecutionEventBus.clearListener();
         DQLExecutionEventBus.clearListener();
+        executorEngine.shutdown();
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void assertNoStatement() throws SQLException {
+        PreparedStatementExecutor actual = new PreparedStatementExecutor(executorEngine, Collections.EMPTY_LIST);
+        assertThat(actual.execute(), is(false));
+        assertThat(actual.executeUpdate(), is(0));
+        assertThat(actual.executeQuery().size(), is(0));
     }
     
     @Test
@@ -355,8 +365,8 @@ public final class PreparedStatementExecutorTest {
     private PreparedStatementExecutorWrapper createPreparedStatementExecutorWrapper(final PreparedStatement preparedStatement, final String dataSource, final String sql) {
         try {
             return new PreparedStatementExecutorWrapper(preparedStatement, Collections.emptyList(), new SQLExecutionUnit(dataSource, (SQLBuilder) new SQLBuilder().append(sql)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
